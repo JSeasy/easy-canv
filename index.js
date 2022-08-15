@@ -2,6 +2,7 @@ class Canvas {
   constructor(target, height, width) {
     this.canvas = null;
     this.objects = [];
+    this.controls = [];
     this.activeObject = null;
     this.paddingX = 0;
     this.paddingY = 0;
@@ -19,6 +20,7 @@ class Canvas {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
   }
+  //绑定事件
   bindEvent() {
     const { canvas } = this;
     canvas.addEventListener("mousedown", (e) => {
@@ -31,7 +33,6 @@ class Canvas {
         filterObjects.length === 1
           ? filterObjects[0]
           : filterObjects[filterObjects.length - 1];
-
       this.drawControl(this.activeObject);
       this.paddingX = offsetX - this.activeObject.x;
       this.paddingY = offsetY - this.activeObject.y;
@@ -43,13 +44,51 @@ class Canvas {
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
       this.render();
+      this.drawControl(this.activeObject);
     });
     canvas.addEventListener("mouseup", (e) => {
       this.reset();
     });
   }
   drawControl(target) {
+    console.log("this.asdas");
     const { x, y, height, width } = target;
+    this.drawLine(
+      {
+        beginPoint: { x, y },
+        endPoint: { x: x + width, y: y },
+        lineWidth: 10,
+        strokeStyle: "red",
+      },
+      this.ctx
+    );
+    this.drawLine(
+      {
+        beginPoint: { x, y },
+        endPoint: { x: x, y: y + height },
+        lineWidth: 10,
+        strokeStyle: "red",
+      },
+      this.ctx
+    );
+    this.drawLine(
+      {
+        beginPoint: { x: x + width, y },
+        endPoint: { x: x + width, y: y + height },
+        lineWidth: 10,
+        strokeStyle: "red",
+      },
+      this.ctx
+    );
+    this.drawLine(
+      {
+        beginPoint: { x, y: y + height },
+        endPoint: { x: x + width, y: y + height },
+        lineWidth: 10,
+        strokeStyle: "red",
+      },
+      this.ctx
+    );
   }
   reset() {
     this.activeObject = null;
@@ -64,13 +103,26 @@ class Canvas {
 
   add(target) {
     this.objects.push(target);
-    console.log(this.objects);
   }
-  draw({ x, y, height, width, fillStyle }) {
+  draw({ type, ...options }) {
     const { ctx } = this;
+    type === "Rect" && this.drawRect(options, ctx);
+    type === "Line" && this.drawLine(options, ctx);
+  }
+  drawRect({ x, y, height, width, fillStyle }, ctx) {
     ctx.fillStyle = fillStyle;
     ctx.fillRect(x, y, height, width);
   }
+
+  drawLine({ beginPoint, endPoint, lineWidth, strokeStyle }, ctx) {
+    ctx.beginPath();
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.moveTo(beginPoint.x, beginPoint.y);
+    ctx.lineTo(endPoint.x, endPoint.y);
+    ctx.stroke();
+  }
+
   clear() {
     const { height, width } = this.canvas;
     this.ctx.fillStyle = "white";
@@ -78,41 +130,10 @@ class Canvas {
   }
   render() {
     this.clear();
-
-    requestAnimationFrame(() => {
-      this.objects.forEach((item) => {
-        this.draw(item);
-      });
+    this.objects.forEach((item) => {
+      this.draw(item);
     });
   }
   upper(target) {}
   lower(target) {}
-}
-
-class Base {
-  constructor(options) {
-    this.initOptions(options);
-  }
-  initOptions(options) {
-    Object.keys(options).forEach((item) => {
-      this[item] = options[item];
-    });
-  }
-}
-class Rect extends Base {
-  constructor(options) {
-    super(options);
-    this.type = "Rect";
-  }
-}
-
-class Line {
-  constructor({ x, y, height, width, fill }) {
-    this.x = x;
-    this.y = y;
-    this.height = height;
-    this.width = width;
-    this.fill = fill;
-    this.type = "Rect";
-  }
 }
