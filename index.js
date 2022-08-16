@@ -33,6 +33,7 @@ class Canvas {
         filterObjects.length === 1
           ? filterObjects[0]
           : filterObjects[filterObjects.length - 1];
+      this.render();
       this.drawControl(this.activeObject);
       this.paddingX = offsetX - this.activeObject.x;
       this.paddingY = offsetY - this.activeObject.y;
@@ -49,6 +50,11 @@ class Canvas {
     canvas.addEventListener("mouseup", (e) => {
       this.reset();
     });
+  }
+  reset() {
+    this.activeObject = null;
+    this.paddingX = 0;
+    this.paddingY = 0;
   }
   drawControl(target) {
     console.log("this.asdas");
@@ -90,11 +96,7 @@ class Canvas {
       this.ctx
     );
   }
-  reset() {
-    this.activeObject = null;
-    this.paddingX = 0;
-    this.paddingY = 0;
-  }
+
   isIncludesTheRange(offsetX, offsetY, { x, y, height, width }) {
     return (
       offsetX > x && offsetX < x + width && offsetY < y + height && offsetY > y
@@ -108,12 +110,15 @@ class Canvas {
     const { ctx } = this;
     type === "Rect" && this.drawRect(options, ctx);
     type === "Line" && this.drawLine(options, ctx);
+    type === "Image" && this.drawImage(options, ctx);
   }
   drawRect({ x, y, height, width, fillStyle }, ctx) {
     ctx.fillStyle = fillStyle;
     ctx.fillRect(x, y, height, width);
   }
-
+  drawImage({ x, y, src }, ctx) {
+    ctx.drawImage(src, x, y, src.width, src.height);
+  }
   drawLine({ beginPoint, endPoint, lineWidth, strokeStyle }, ctx) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
