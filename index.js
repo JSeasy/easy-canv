@@ -47,8 +47,8 @@ class Canvas {
       this.render();
       this.drawControl(this.activeObject);
     });
-    canvas.addEventListener("mouseup", (e) => {
-      this.reset();
+    document.addEventListener("mouseup", (e) => {
+      this.activeObject && this.reset();
     });
   }
   reset() {
