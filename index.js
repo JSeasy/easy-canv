@@ -106,19 +106,17 @@ class Canvas {
   add(target) {
     this.objects.push(target);
   }
-  draw({ type, ...options }) {
+  draw(item) {
     const { ctx } = this;
-    type === "Rect" && this.drawRect(options, ctx);
-    type === "Line" && this.drawLine(options, ctx);
-    type === "Image" && this.drawImage(options, ctx);
+    item._draw(ctx);
   }
-  drawRect({ x, y, height, width, fillStyle }, ctx) {
-    ctx.fillStyle = fillStyle;
-    ctx.fillRect(x, y, height, width);
-  }
-  drawImage({ x, y, src }, ctx) {
-    ctx.drawImage(src, x, y, src.width, src.height);
-  }
+  // drawRect({ x, y, height, width, fillStyle }, ctx) {
+  //   ctx.fillStyle = fillStyle;
+  //   ctx.fillRect(x, y, height, width);
+  // }
+  // drawImage({ x, y, src }, ctx) {
+  //   ctx.drawImage(src, x, y, src.width, src.height);
+  // }
   drawLine({ beginPoint, endPoint, lineWidth, strokeStyle }, ctx) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;

@@ -7,4 +7,8 @@ class Photo {
     this.y = y;
     this.type = "Image";
   }
+  _draw(ctx) {
+    const { src, x, y } = this;
+    ctx.drawImage(src, x, y, src.width, src.height);
+  }
 }

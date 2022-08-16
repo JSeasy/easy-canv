@@ -7,4 +7,9 @@ class Rect {
     this.fillStyle = fillStyle;
     this.type = "Rect";
   }
+  _draw(ctx) {
+    const { fillStyle, x, y, height, width } = this;
+    ctx.fillStyle = fillStyle;
+    ctx.fillRect(x, y, height, width);
+  }
 }
