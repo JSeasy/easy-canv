@@ -63,7 +63,7 @@ class Canvas {
       {
         beginPoint: { x, y },
         endPoint: { x: x + width, y: y },
-        lineWidth: 10,
+        lineWidth: 2,
         strokeStyle: "red",
       },
       this.ctx
@@ -72,7 +72,7 @@ class Canvas {
       {
         beginPoint: { x, y },
         endPoint: { x: x, y: y + height },
-        lineWidth: 10,
+        lineWidth: 2,
         strokeStyle: "red",
       },
       this.ctx
@@ -81,7 +81,7 @@ class Canvas {
       {
         beginPoint: { x: x + width, y },
         endPoint: { x: x + width, y: y + height },
-        lineWidth: 10,
+        lineWidth: 2,
         strokeStyle: "red",
       },
       this.ctx
@@ -90,7 +90,7 @@ class Canvas {
       {
         beginPoint: { x, y: y + height },
         endPoint: { x: x + width, y: y + height },
-        lineWidth: 10,
+        lineWidth: 2,
         strokeStyle: "red",
       },
       this.ctx
