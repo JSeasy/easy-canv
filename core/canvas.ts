@@ -1,14 +1,15 @@
-import { ILine, IPhoto, IRect, ITarget, TObjects } from "../types";
+import { IBase, ILine, ITarget, TObjects } from "../types";
 
-class Canvas {
+class Canvas extends IBase {
   canvas: HTMLCanvasElement;
   objects: TObjects;
   controls: [];
   redo: TObjects[];
   undo: TObjects[];
-  activeObject: ILine | IPhoto | IRect;
+  activeObject: ITarget;
   ctx: CanvasRenderingContext2D | null;
   constructor({ el, height, width, stored }) {
+    super();
     this.canvas = null;
     this.objects = [];
     this.controls = [];
@@ -183,7 +184,10 @@ class Canvas {
     const { ctx } = this;
     item._draw(ctx);
   }
-  drawLine({ beginPoint, endPoint, lineWidth, strokeStyle }, ctx) {
+  drawLine(
+    { beginPoint, endPoint, lineWidth, strokeStyle }: Omit<ILine, "type">,
+    ctx
+  ) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;

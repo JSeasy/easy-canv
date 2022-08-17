@@ -1,4 +1,6 @@
-class Rect {
+import { IRect } from "../types";
+
+class Rect implements IRect {
   constructor({ x, y, height, width, fillStyle }) {
     this.x = x;
     this.y = y;
