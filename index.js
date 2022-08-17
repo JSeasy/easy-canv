@@ -1,18 +1,21 @@
 class Canvas {
-  constructor(target, height, width) {
+  constructor({ el, height, width, stored }) {
     this.canvas = null;
     this.objects = [];
     this.controls = [];
+    this.redo = [];
+    this.undo = [];
     this.activeObject = null;
     this.paddingX = 0;
     this.paddingY = 0;
     this.height = height;
     this.width = width;
-    this.init(target);
+    this.stored = stored;
+    this.init(el);
     this.bindEvent();
   }
-  init(target) {
-    const canvasWrap = document.querySelector(target);
+  init(el) {
+    const canvasWrap = document.querySelector(el);
     const canvas = document.createElement("canvas");
     canvasWrap.appendChild(canvas);
     canvas.height = this.height;
@@ -28,7 +31,10 @@ class Canvas {
       const filterObjects = this.objects.filter((object) =>
         this.isIncludesTheRange(offsetX, offsetY, object)
       );
-      if (!filterObjects.length) return;
+      if (!filterObjects.length) {
+        this.render();
+        return;
+      }
       this.activeObject =
         filterObjects.length === 1
           ? filterObjects[0]
@@ -46,10 +52,67 @@ class Canvas {
       this.activeObject.y = offsetY - this.paddingY;
       this.render();
       this.drawControl(this.activeObject);
+      this.drawHelpLine();
     });
     document.addEventListener("mouseup", (e) => {
       this.activeObject && this.reset();
+      this.activeObject && this.stored && this.save();
     });
+  }
+  setCenter(target) {
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    target.x = centerX - target.width / 2;
+    target.y = centerY - target.height / 2;
+  }
+  drawHelpLine() {
+    if (this.isCenterY()) {
+      this.drawLine(
+        {
+          beginPoint: { x: this.width / 2, y: 0 },
+          endPoint: { x: this.width / 2, y: this.height },
+          lineWidth: 2,
+          strokeStyle: "red",
+        },
+        this.ctx
+      );
+    }
+    if (this.isCenterX()) {
+      this.drawLine(
+        {
+          beginPoint: { x: this.width / 2, y: 0 },
+          endPoint: { x: this.width / 2, y: this.height },
+          lineWidth: 2,
+          strokeStyle: "red",
+        },
+        this.ctx
+      );
+    }
+  }
+  isCenterY() {
+    const halfHeight = this.height / 2;
+    const halfWidth = this.width / 2;
+    const centerPositionX = this.activeObject.x + this.activeObject.width / 2;
+    const centerPositionY = this.activeObject.y + this.activeObject.height / 2;
+    if (halfHeight - 2 < centerPositionY && centerPositionY < halfHeight + 2) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  isCenterX() {
+    const halfHeight = this.height / 2;
+    const halfWidth = this.width / 2;
+    const centerPositionX = this.activeObject.x + this.activeObject.width / 2;
+    const centerPositionY = this.activeObject.y + this.activeObject.height / 2;
+    if (halfWidth - 2 < centerPositionX && centerPositionX < halfWidth + 2) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  save() {
+    this.redo.push(this.objects);
   }
   reset() {
     this.activeObject = null;

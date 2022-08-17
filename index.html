@@ -10,6 +10,11 @@
     .canvasWrap {
       display: flex;
       justify-content: center;
+
+    }
+
+    canvas {
+      border: 1px dashed #cccccc;
     }
   </style>
 </head>
@@ -23,7 +28,7 @@
   <script src="./Rect.js"></script>
   <script src="./Photo.js"></script>
   <script>
-    const canvas = new Canvas(".canvasWrap", 550, 550);
+    const canvas = new Canvas({ el: ".canvasWrap", height: 550, width: 550, stored: true });
 
     const add = document.querySelector("#add");
     add.onclick = () => {
@@ -47,16 +52,16 @@
 
 
 
-      const img = new Image()
-      img.src = 'https://image.s2bdiy.com/open/EKS4xskcPK.png?x-oss-process=image/resize,m_lfit,limit_0,w_1000,h_1000/auto-orient,0/quality,Q_100'
-      img.onload = () => {
-        const imgObj = new Photo({
-          src: img,
-          x: 100,
-          y: 150,
-        })
-        canvas.add(imgObj)
-      }
+      // const img = new Image()
+      // img.src = 'https://image.s2bdiy.com/open/EKS4xskcPK.png?x-oss-process=image/resize,m_lfit,limit_0,w_1000,h_1000/auto-orient,0/quality,Q_100'
+      // img.onload = () => {
+      //   const imgObj = new Photo({
+      //     src: img,
+      //     x: 100,
+      //     y: 150,
+      //   })
+      //   canvas.add(imgObj)
+      // }
 
       canvas.add(rect2);
       canvas.render();
