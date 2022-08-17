@@ -1,4 +1,13 @@
+import { ILine, IPhoto, IRect, ITarget, TObjects } from "../types";
+
 class Canvas {
+  canvas: HTMLCanvasElement;
+  objects: TObjects;
+  controls: [];
+  redo: TObjects[];
+  undo: TObjects[];
+  activeObject: ILine | IPhoto | IRect;
+  ctx: CanvasRenderingContext2D | null;
   constructor({ el, height, width, stored }) {
     this.canvas = null;
     this.objects = [];
@@ -14,7 +23,7 @@ class Canvas {
     this.init(el);
     this.bindEvent();
   }
-  init(el) {
+  init(el: string) {
     const canvasWrap = document.querySelector(el);
     const canvas = document.createElement("canvas");
     canvasWrap.appendChild(canvas);
@@ -65,7 +74,7 @@ class Canvas {
       e.preventDefault();
     });
   }
-  setCenter(target) {
+  setCenter(target: ITarget) {
     const centerX = this.width / 2;
     const centerY = this.height / 2;
     target.x = centerX - target.width / 2;
@@ -121,7 +130,7 @@ class Canvas {
     this.paddingX = 0;
     this.paddingY = 0;
   }
-  drawControl(target) {
+  drawControl(target: ITarget) {
     const { x, y, height, width } = target;
     this.drawLine(
       {
