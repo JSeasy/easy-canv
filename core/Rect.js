@@ -13,3 +13,5 @@ class Rect {
     ctx.fillRect(x, y, height, width);
   }
 }
+
+export default Rect;

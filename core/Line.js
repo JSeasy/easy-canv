@@ -3,3 +3,5 @@ class Line {
     this.type = "Line";
   }
 }
+
+export default Line;

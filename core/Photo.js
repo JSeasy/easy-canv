@@ -12,3 +12,5 @@ class Photo {
     ctx.drawImage(src, x, y, src.width, src.height);
   }
 }
+
+export default Photo;
