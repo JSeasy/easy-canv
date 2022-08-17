@@ -192,6 +192,7 @@ class Canvas {
   render() {
     this.clear();
     this.objects.forEach((item) => {
+      console.log("123");
       this.draw(item);
     });
   }

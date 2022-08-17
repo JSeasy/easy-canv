@@ -1,8 +1,8 @@
 {
-  "name": "canvas",
+  "name": "easy-canvas",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./core",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
