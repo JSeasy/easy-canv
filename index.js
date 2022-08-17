@@ -69,9 +69,9 @@ class Canvas {
     if (this.isCenterY()) {
       this.drawLine(
         {
-          beginPoint: { x: this.width / 2, y: 0 },
-          endPoint: { x: this.width / 2, y: this.height },
-          lineWidth: 2,
+          beginPoint: { x: 0, y: this.height / 2 },
+          endPoint: { x: this.width, y: this.height / 2 },
+          lineWidth: 0.5,
           strokeStyle: "red",
         },
         this.ctx
@@ -82,7 +82,7 @@ class Canvas {
         {
           beginPoint: { x: this.width / 2, y: 0 },
           endPoint: { x: this.width / 2, y: this.height },
-          lineWidth: 2,
+          lineWidth: 0.5,
           strokeStyle: "red",
         },
         this.ctx
@@ -91,8 +91,6 @@ class Canvas {
   }
   isCenterY() {
     const halfHeight = this.height / 2;
-    const halfWidth = this.width / 2;
-    const centerPositionX = this.activeObject.x + this.activeObject.width / 2;
     const centerPositionY = this.activeObject.y + this.activeObject.height / 2;
     if (halfHeight - 2 < centerPositionY && centerPositionY < halfHeight + 2) {
       return true;
@@ -101,10 +99,8 @@ class Canvas {
     }
   }
   isCenterX() {
-    const halfHeight = this.height / 2;
     const halfWidth = this.width / 2;
     const centerPositionX = this.activeObject.x + this.activeObject.width / 2;
-    const centerPositionY = this.activeObject.y + this.activeObject.height / 2;
     if (halfWidth - 2 < centerPositionX && centerPositionX < halfWidth + 2) {
       return true;
     } else {
@@ -173,19 +169,13 @@ class Canvas {
     const { ctx } = this;
     item._draw(ctx);
   }
-  // drawRect({ x, y, height, width, fillStyle }, ctx) {
-  //   ctx.fillStyle = fillStyle;
-  //   ctx.fillRect(x, y, height, width);
-  // }
-  // drawImage({ x, y, src }, ctx) {
-  //   ctx.drawImage(src, x, y, src.width, src.height);
-  // }
   drawLine({ beginPoint, endPoint, lineWidth, strokeStyle }, ctx) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;
     ctx.moveTo(beginPoint.x, beginPoint.y);
     ctx.lineTo(endPoint.x, endPoint.y);
+    // ctx.setLineDash([5, 10]);
     ctx.stroke();
   }
 
