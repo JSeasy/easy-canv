@@ -1,12 +1,11 @@
 import { IBase, IInitOptions, ITarget, TObjects } from "../types";
 import Control from "./Control";
 import Line from "./Line";
-import Rect from "./Rect";
 
 class Canvas {
   canvas: HTMLCanvasElement | null;
   objects: TObjects;
-  controls: [];
+  control: Control | null;
   redo: TObjects[];
   undo: TObjects[];
   activeObject: ITarget | null;
@@ -19,7 +18,7 @@ class Canvas {
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
-    this.controls = [];
+    this.control = null;
     this.redo = [];
     this.undo = [];
     this.activeObject = null;
@@ -51,12 +50,10 @@ class Canvas {
       );
       if (!filterObjects.length) {
         this.render();
+        this.control = null;
         return;
       }
-      this.activeObject =
-        filterObjects.length === 1
-          ? filterObjects[0]
-          : filterObjects[filterObjects.length - 1];
+      this.activeObject = filterObjects[filterObjects.length - 1];
       this.render();
       this.drawControl(this.activeObject);
       this.paddingX = offsetX - this.activeObject.x;
@@ -64,6 +61,7 @@ class Canvas {
     });
 
     canvas!.addEventListener("mousemove", (e) => {
+      !this.activeObject && this.changeTheCursorStyle(e);
       if (!this.activeObject) return;
       const { offsetX, offsetY } = e;
       this.activeObject.x = offsetX - this.paddingX;
@@ -82,6 +80,31 @@ class Canvas {
       }
       e.preventDefault();
     });
+  }
+  changeTheCursorStyle(e: MouseEvent) {
+    const { offsetX, offsetY } = e;
+    const filterObjects = this.objects.filter((object) =>
+      this.isIncludesTheRange(offsetX, offsetY, object)
+    );
+    filterObjects.length
+      ? this.setCursorStyle("pointer")
+      : this.setCursorStyle("auto");
+    this.control && this.changeTheControlMouseStyle(offsetX, offsetY);
+  }
+  changeTheControlMouseStyle(offsetX: number, offsetY: number) {
+    const { tr, tl, br, bl } = this.control!;
+    this.isIncludesTheRange(offsetX, offsetY, tr!) &&
+      this.setCursorStyle("pointer");
+    this.isIncludesTheRange(offsetX, offsetY, tl!) &&
+      this.setCursorStyle("ne-resize");
+    this.isIncludesTheRange(offsetX, offsetY, br!) &&
+      this.setCursorStyle("ne-resize");
+    this.isIncludesTheRange(offsetX, offsetY, bl!) &&
+      this.setCursorStyle("nw-resize");
+  }
+
+  setCursorStyle(type: string) {
+    this.canvas!.style.cursor = type;
   }
   setCenter(target: ITarget) {
     const centerX = this.width / 2;
@@ -139,13 +162,15 @@ class Canvas {
     this.paddingY = 0;
   }
   drawControl(target: ITarget) {
-    new Control(target).draw(this.ctx!);
+    const control = new Control(target);
+    control.draw(this.ctx!);
+    this.control = control;
   }
 
   isIncludesTheRange(
     offsetX: number,
     offsetY: number,
-    { x, y, height, width }: IBase
+    { x, y, height, width }: ITarget
   ) {
     return (
       offsetX > x && offsetX < x + width && offsetY < y + height && offsetY > y
