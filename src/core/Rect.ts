@@ -4,19 +4,32 @@ class Rect {
   height: number;
   width: number;
   fillStyle: string;
+  scaleX?: number;
+  scaleY?: number;
   type: "Rect";
-  constructor({ x, y, height, width, fillStyle }: Omit<Rect, "type" | "draw">) {
+  constructor({
+    x,
+    y,
+    height,
+    width,
+    fillStyle,
+    scaleX = 1,
+    scaleY = 1,
+  }: Omit<Rect, "type" | "draw">) {
     this.x = x;
     this.y = y;
     this.height = height;
     this.width = width;
     this.fillStyle = fillStyle;
+    this.scaleX = scaleX;
+    this.scaleY = scaleY;
     this.type = "Rect";
   }
   draw(ctx: CanvasRenderingContext2D) {
-    const { fillStyle, x, y, height, width } = this;
+    const { fillStyle, x, y, height, width, scaleX, scaleY } = this;
     ctx.fillStyle = fillStyle;
-    ctx.fillRect(x, y, height, width);
+
+    ctx.fillRect(x, y, height * scaleY!, width * scaleX!);
   }
 }
 

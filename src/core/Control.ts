@@ -18,8 +18,17 @@ class Control {
     this.drawBoder(ctx);
     this.drawRect(ctx);
   }
+  getTransformPosition() {
+    const { x, y, height, width, scaleX, scaleY } = this.target;
+    return {
+      x,
+      y,
+      height: height * scaleY!,
+      width: width * scaleX!,
+    };
+  }
   drawBoder(ctx: CanvasRenderingContext2D) {
-    const { x, y, height, width } = this.target;
+    const { x, y, height, width } = this.getTransformPosition();
     new Line({
       points: [
         { x, y },
@@ -33,7 +42,7 @@ class Control {
     }).draw(ctx);
   }
   drawRect(ctx: CanvasRenderingContext2D) {
-    const { x, y, height, width } = this.target;
+    const { x, y, height, width } = this.getTransformPosition();
     const rectWidth = 15;
     const halfRectWidth = rectWidth / 2;
     this.tr = new Rect({

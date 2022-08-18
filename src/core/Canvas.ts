@@ -15,10 +15,12 @@ class Canvas {
   paddingX: number;
   paddingY: number;
   stored: boolean;
+  controlType: string;
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
     this.control = null;
+    this.controlType = "";
     this.redo = [];
     this.undo = [];
     this.activeObject = null;
@@ -51,6 +53,7 @@ class Canvas {
       if (!filterObjects.length) {
         this.render();
         this.control = null;
+        this.controlType = "";
         return;
       }
       this.activeObject = filterObjects[filterObjects.length - 1];
@@ -64,8 +67,10 @@ class Canvas {
       !this.activeObject && this.changeTheCursorStyle(e);
       if (!this.activeObject) return;
       const { offsetX, offsetY } = e;
+
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
+
       this.render();
       this.drawControl(this.activeObject);
       this.drawHelpLine();
@@ -94,13 +99,13 @@ class Canvas {
   changeTheControlMouseStyle(offsetX: number, offsetY: number) {
     const { tr, tl, br, bl } = this.control!;
     this.isIncludesTheRange(offsetX, offsetY, tr!) &&
-      this.setCursorStyle("pointer");
+      ((this.controlType = "tr"), this.setCursorStyle("pointer"));
     this.isIncludesTheRange(offsetX, offsetY, tl!) &&
-      this.setCursorStyle("ne-resize");
+      ((this.controlType = "tl"), this.setCursorStyle("ne-resize"));
     this.isIncludesTheRange(offsetX, offsetY, br!) &&
-      this.setCursorStyle("ne-resize");
+      ((this.controlType = "br"), this.setCursorStyle("ne-resize"));
     this.isIncludesTheRange(offsetX, offsetY, bl!) &&
-      this.setCursorStyle("nw-resize");
+      ((this.controlType = "bl"), this.setCursorStyle("ne-resize"));
   }
 
   setCursorStyle(type: string) {
