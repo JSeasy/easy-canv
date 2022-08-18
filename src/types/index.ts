@@ -24,4 +24,3 @@ export interface IInitOptions {
   width: number;
   stored?: boolean;
 }
-

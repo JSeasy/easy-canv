@@ -3,8 +3,16 @@ import Line from "./Line";
 import Rect from "./Rect";
 class Control {
   target: ITarget;
+  tr: Rect | null;
+  tl: Rect | null;
+  br: Rect | null;
+  bl: Rect | null;
   constructor(target: ITarget) {
     this.target = target;
+    this.tr = null;
+    this.tl = null;
+    this.br = null;
+    this.bl = null;
   }
   draw(ctx: CanvasRenderingContext2D) {
     this.drawBoder(ctx);
@@ -26,37 +34,40 @@ class Control {
   }
   drawRect(ctx: CanvasRenderingContext2D) {
     const { x, y, height, width } = this.target;
-    const rectWidth = 10;
+    const rectWidth = 15;
     const halfRectWidth = rectWidth / 2;
-    new Rect({
+    this.tr = new Rect({
       x: x - halfRectWidth,
       y: y - halfRectWidth,
       height: rectWidth,
       width: rectWidth,
       fillStyle: "blue",
-    }).draw(ctx);
-
-    new Rect({
+    });
+    this.tl = new Rect({
       x: x - halfRectWidth,
       y: y + height - halfRectWidth,
       height: rectWidth,
       width: rectWidth,
       fillStyle: "blue",
-    }).draw(ctx);
-    new Rect({
+    });
+    this.br = new Rect({
       x: x + width - halfRectWidth,
       y: y - halfRectWidth,
       height: rectWidth,
       width: rectWidth,
       fillStyle: "blue",
-    }).draw(ctx);
-    new Rect({
+    });
+    this.bl = new Rect({
       x: x + width - halfRectWidth,
       y: y + height - halfRectWidth,
       height: rectWidth,
       width: rectWidth,
       fillStyle: "blue",
-    }).draw(ctx);
+    });
+    this.tr.draw(ctx);
+    this.tl.draw(ctx);
+    this.br.draw(ctx);
+    this.bl.draw(ctx);
   }
 }
 
