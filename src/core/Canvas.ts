@@ -1,15 +1,20 @@
-import { IBase, ILine, ITarget, TObjects } from "../types";
+import { IBase, IInitOptions, ITarget, TObjects } from "../types";
+import Line from "./Line";
 
-class Canvas extends IBase {
-  canvas: HTMLCanvasElement;
+class Canvas {
+  canvas: HTMLCanvasElement | null;
   objects: TObjects;
   controls: [];
   redo: TObjects[];
   undo: TObjects[];
-  activeObject: ITarget;
+  activeObject: ITarget | null;
   ctx: CanvasRenderingContext2D | null;
-  constructor({ el, height, width, stored }) {
-    super();
+  height: number;
+  width: number;
+  paddingX: number;
+  paddingY: number;
+  stored: boolean;
+  constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
     this.controls = [];
@@ -21,13 +26,14 @@ class Canvas extends IBase {
     this.height = height;
     this.width = width;
     this.stored = stored;
+    this.ctx = null;
     this.init(el);
     this.bindEvent();
   }
   init(el: string) {
     const canvasWrap = document.querySelector(el);
     const canvas = document.createElement("canvas");
-    canvasWrap.appendChild(canvas);
+    canvasWrap && canvasWrap.appendChild(canvas);
     canvas.height = this.height;
     canvas.width = this.width;
     this.canvas = canvas;
@@ -36,7 +42,7 @@ class Canvas extends IBase {
   //绑定事件
   bindEvent() {
     const { canvas } = this;
-    canvas.addEventListener("mousedown", (e) => {
+    canvas!.addEventListener("mousedown", (e) => {
       const { offsetX, offsetY } = e;
       const filterObjects = this.objects.filter((object) =>
         this.isIncludesTheRange(offsetX, offsetY, object)
@@ -55,7 +61,7 @@ class Canvas extends IBase {
       this.paddingY = offsetY - this.activeObject.y;
     });
 
-    canvas.addEventListener("mousemove", (e) => {
+    canvas!.addEventListener("mousemove", (e) => {
       if (!this.activeObject) return;
       const { offsetX, offsetY } = e;
       this.activeObject.x = offsetX - this.paddingX;
@@ -68,7 +74,7 @@ class Canvas extends IBase {
       this.activeObject && this.reset();
       this.activeObject && this.stored && this.save();
     });
-    canvas.addEventListener("contextmenu", (e) => {
+    canvas!.addEventListener("contextmenu", (e) => {
       if (this.activeObject) {
         console.log(123);
       }
@@ -90,7 +96,7 @@ class Canvas extends IBase {
           lineWidth: 0.5,
           strokeStyle: "red",
         },
-        this.ctx
+        this.ctx!
       );
     }
     if (this.isCenterX()) {
@@ -101,13 +107,14 @@ class Canvas extends IBase {
           lineWidth: 0.5,
           strokeStyle: "red",
         },
-        this.ctx
+        this.ctx!
       );
     }
   }
   isCenterY() {
     const halfHeight = this.height / 2;
-    const centerPositionY = this.activeObject.y + this.activeObject.height / 2;
+    const centerPositionY =
+      this.activeObject!.y + this.activeObject!.height / 2;
     if (halfHeight - 2 < centerPositionY && centerPositionY < halfHeight + 2) {
       return true;
     } else {
@@ -116,7 +123,7 @@ class Canvas extends IBase {
   }
   isCenterX() {
     const halfWidth = this.width / 2;
-    const centerPositionX = this.activeObject.x + this.activeObject.width / 2;
+    const centerPositionX = this.activeObject!.x + this.activeObject!.width / 2;
     if (halfWidth - 2 < centerPositionX && centerPositionX < halfWidth + 2) {
       return true;
     } else {
@@ -140,7 +147,7 @@ class Canvas extends IBase {
         lineWidth: 2,
         strokeStyle: "red",
       },
-      this.ctx
+      this.ctx!
     );
     this.drawLine(
       {
@@ -149,7 +156,7 @@ class Canvas extends IBase {
         lineWidth: 2,
         strokeStyle: "red",
       },
-      this.ctx
+      this.ctx!
     );
     this.drawLine(
       {
@@ -158,7 +165,7 @@ class Canvas extends IBase {
         lineWidth: 2,
         strokeStyle: "red",
       },
-      this.ctx
+      this.ctx!
     );
     this.drawLine(
       {
@@ -167,26 +174,30 @@ class Canvas extends IBase {
         lineWidth: 2,
         strokeStyle: "red",
       },
-      this.ctx
+      this.ctx!
     );
   }
 
-  isIncludesTheRange(offsetX, offsetY, { x, y, height, width }) {
+  isIncludesTheRange(
+    offsetX: number,
+    offsetY: number,
+    { x, y, height, width }: IBase
+  ) {
     return (
       offsetX > x && offsetX < x + width && offsetY < y + height && offsetY > y
     );
   }
 
-  add(target) {
+  add(target: ITarget) {
     this.objects.push(target);
   }
-  draw(item) {
+  draw(item: ITarget) {
     const { ctx } = this;
-    item._draw(ctx);
+    item._draw(ctx!);
   }
   drawLine(
-    { beginPoint, endPoint, lineWidth, strokeStyle }: Omit<ILine, "type">,
-    ctx
+    { beginPoint, endPoint, lineWidth, strokeStyle }: Omit<Line, "type">,
+    ctx: CanvasRenderingContext2D
   ) {
     ctx.beginPath();
     ctx.strokeStyle = strokeStyle;
@@ -198,9 +209,9 @@ class Canvas extends IBase {
   }
 
   clear() {
-    const { height, width } = this.canvas;
-    this.ctx.fillStyle = "white";
-    this.ctx.fillRect(0, 0, height, width);
+    const { height, width } = this.canvas!;
+    this.ctx!.fillStyle = "white";
+    this.ctx!.fillRect(0, 0, height, width);
   }
   render() {
     this.clear();
@@ -209,8 +220,8 @@ class Canvas extends IBase {
       this.draw(item);
     });
   }
-  upper(target) {}
-  lower(target) {}
+  // upper(target) {}
+  // lower(target) {}
 }
 
 export default Canvas;

@@ -1,7 +1,17 @@
-import { IRect } from "../types";
-
-class Rect implements IRect {
-  constructor({ x, y, height, width, fillStyle }) {
+class Rect {
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  fillStyle: string;
+  type: "Rect";
+  constructor({
+    x,
+    y,
+    height,
+    width,
+    fillStyle,
+  }: Omit<Rect, "type" | "_draw">) {
     this.x = x;
     this.y = y;
     this.height = height;
@@ -9,7 +19,7 @@ class Rect implements IRect {
     this.fillStyle = fillStyle;
     this.type = "Rect";
   }
-  _draw(ctx) {
+  _draw(ctx: CanvasRenderingContext2D) {
     const { fillStyle, x, y, height, width } = this;
     ctx.fillStyle = fillStyle;
     ctx.fillRect(x, y, height, width);
