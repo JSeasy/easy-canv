@@ -1,5 +1,7 @@
 import { IBase, IInitOptions, ITarget, TObjects } from "../types";
+import Control from "./Control";
 import Line from "./Line";
+import Rect from "./Rect";
 
 class Canvas {
   canvas: HTMLCanvasElement | null;
@@ -89,26 +91,24 @@ class Canvas {
   }
   drawHelpLine() {
     if (this.isCenterY()) {
-      this.drawLine(
-        {
-          beginPoint: { x: 0, y: this.height / 2 },
-          endPoint: { x: this.width, y: this.height / 2 },
-          lineWidth: 0.5,
-          strokeStyle: "red",
-        },
-        this.ctx!
-      );
+      new Line({
+        points: [
+          { x: 0, y: this.height / 2 },
+          { x: this.width, y: this.height / 2 },
+        ],
+        lineWidth: 0.5,
+        strokeStyle: "red",
+      }).draw(this.ctx!);
     }
     if (this.isCenterX()) {
-      this.drawLine(
-        {
-          beginPoint: { x: this.width / 2, y: 0 },
-          endPoint: { x: this.width / 2, y: this.height },
-          lineWidth: 0.5,
-          strokeStyle: "red",
-        },
-        this.ctx!
-      );
+      new Line({
+        points: [
+          { x: this.width / 2, y: 0 },
+          { x: this.width / 2, y: this.height },
+        ],
+        lineWidth: 0.5,
+        strokeStyle: "red",
+      }).draw(this.ctx!);
     }
   }
   isCenterY() {
@@ -139,43 +139,7 @@ class Canvas {
     this.paddingY = 0;
   }
   drawControl(target: ITarget) {
-    const { x, y, height, width } = target;
-    this.drawLine(
-      {
-        beginPoint: { x, y },
-        endPoint: { x: x + width, y: y },
-        lineWidth: 2,
-        strokeStyle: "red",
-      },
-      this.ctx!
-    );
-    this.drawLine(
-      {
-        beginPoint: { x, y },
-        endPoint: { x: x, y: y + height },
-        lineWidth: 2,
-        strokeStyle: "red",
-      },
-      this.ctx!
-    );
-    this.drawLine(
-      {
-        beginPoint: { x: x + width, y },
-        endPoint: { x: x + width, y: y + height },
-        lineWidth: 2,
-        strokeStyle: "red",
-      },
-      this.ctx!
-    );
-    this.drawLine(
-      {
-        beginPoint: { x, y: y + height },
-        endPoint: { x: x + width, y: y + height },
-        lineWidth: 2,
-        strokeStyle: "red",
-      },
-      this.ctx!
-    );
+    new Control(target).draw(this.ctx!);
   }
 
   isIncludesTheRange(
@@ -193,19 +157,7 @@ class Canvas {
   }
   draw(item: ITarget) {
     const { ctx } = this;
-    item._draw(ctx!);
-  }
-  drawLine(
-    { beginPoint, endPoint, lineWidth, strokeStyle }: Omit<Line, "type">,
-    ctx: CanvasRenderingContext2D
-  ) {
-    ctx.beginPath();
-    ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = lineWidth;
-    ctx.moveTo(beginPoint.x, beginPoint.y);
-    ctx.lineTo(endPoint.x, endPoint.y);
-    // ctx.setLineDash([5, 10]);
-    ctx.stroke();
+    item.draw(ctx!);
   }
 
   clear() {

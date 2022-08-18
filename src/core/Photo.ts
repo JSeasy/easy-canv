@@ -6,7 +6,7 @@ class Photo {
   y: number;
   type: "Photo";
 
-  constructor({ src, x, y }: Omit<Photo, "type" | "_draw">) {
+  constructor({ src, x, y }: Omit<Photo, "type" | "draw">) {
     this.src = src;
     this.height = src.height;
     this.width = src.width;
@@ -14,7 +14,7 @@ class Photo {
     this.y = y;
     this.type = "Photo";
   }
-  _draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     const { src, x, y } = this;
     ctx.drawImage(src, x, y, src.width, src.height);
   }

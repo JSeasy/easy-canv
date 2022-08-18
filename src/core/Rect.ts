@@ -5,13 +5,7 @@ class Rect {
   width: number;
   fillStyle: string;
   type: "Rect";
-  constructor({
-    x,
-    y,
-    height,
-    width,
-    fillStyle,
-  }: Omit<Rect, "type" | "_draw">) {
+  constructor({ x, y, height, width, fillStyle }: Omit<Rect, "type" | "draw">) {
     this.x = x;
     this.y = y;
     this.height = height;
@@ -19,7 +13,7 @@ class Rect {
     this.fillStyle = fillStyle;
     this.type = "Rect";
   }
-  _draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     const { fillStyle, x, y, height, width } = this;
     ctx.fillStyle = fillStyle;
     ctx.fillRect(x, y, height, width);
