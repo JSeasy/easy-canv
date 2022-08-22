@@ -1,6 +1,6 @@
 # 对 canvas 的封装
 
-# [在线查看] (https://jseasy.github.io/easy-canv/dist/index.html)
+[在线查看](https://jseasy.github.io/easy-canv/dist/index.html)
 
 # 简单示例
 
