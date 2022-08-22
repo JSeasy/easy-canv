@@ -1,4 +1,4 @@
-import { IBase, IInitOptions, ITarget, TObjects } from "../types";
+import { IInitOptions, IPoint, ITarget, TObjects } from "../types";
 import Control from "./Control";
 import Line from "./Line";
 
@@ -16,6 +16,7 @@ class Canvas {
   paddingY: number;
   stored: boolean;
   controlType: string;
+  mouseDownPosition: IPoint | null;
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
@@ -30,6 +31,7 @@ class Canvas {
     this.width = width;
     this.stored = stored;
     this.ctx = null;
+    this.mouseDownPosition = null;
     this.init(el);
     this.bindEvent();
   }
@@ -47,13 +49,19 @@ class Canvas {
     const { canvas } = this;
     canvas!.addEventListener("mousedown", (e) => {
       const { offsetX, offsetY } = e;
+      if (this.controlType) {
+        this.mouseDownPosition = {
+          x: offsetX,
+          y: offsetY,
+        };
+        return;
+      }
       const filterObjects = this.objects.filter((object) =>
         this.isIncludesTheRange(offsetX, offsetY, object)
       );
       if (!filterObjects.length) {
         this.render();
         this.control = null;
-        this.controlType = "";
         return;
       }
       this.activeObject = filterObjects[filterObjects.length - 1];
@@ -67,10 +75,8 @@ class Canvas {
       !this.activeObject && this.changeTheCursorStyle(e);
       if (!this.activeObject) return;
       const { offsetX, offsetY } = e;
-
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
-
       this.render();
       this.drawControl(this.activeObject);
       this.drawHelpLine();
@@ -98,14 +104,27 @@ class Canvas {
   }
   changeTheControlMouseStyle(offsetX: number, offsetY: number) {
     const { tr, tl, br, bl } = this.control!;
-    this.isIncludesTheRange(offsetX, offsetY, tr!) &&
-      ((this.controlType = "tr"), this.setCursorStyle("pointer"));
-    this.isIncludesTheRange(offsetX, offsetY, tl!) &&
-      ((this.controlType = "tl"), this.setCursorStyle("ne-resize"));
-    this.isIncludesTheRange(offsetX, offsetY, br!) &&
-      ((this.controlType = "br"), this.setCursorStyle("ne-resize"));
-    this.isIncludesTheRange(offsetX, offsetY, bl!) &&
-      ((this.controlType = "bl"), this.setCursorStyle("ne-resize"));
+    if (this.isIncludesTheRange(offsetX, offsetY, tr!)) {
+      this.controlType = "tr";
+      this.setCursorStyle("pointer");
+      return;
+    }
+    if (this.isIncludesTheRange(offsetX, offsetY, tl!)) {
+      this.controlType = "tl";
+      this.setCursorStyle("ne-resize");
+      return;
+    }
+    if (this.isIncludesTheRange(offsetX, offsetY, br!)) {
+      this.controlType = "br";
+      this.setCursorStyle("ne-resize");
+      return;
+    }
+    if (this.isIncludesTheRange(offsetX, offsetY, bl!)) {
+      this.controlType = "bl";
+      this.setCursorStyle("ne-resize");
+      return;
+    }
+    this.controlType = "";
   }
 
   setCursorStyle(type: string) {
