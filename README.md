@@ -4,8 +4,8 @@
 
 # 简单示例
 
-```js
-import { EasyCanv, Rect } from "easy-canv";
+```Typescript
+import { EasyCanv, Rect, Photo } from "easy-canv";
 const EasyCanv = new EasyCanv({
   el: ".canvasWrap",
   height: 550,

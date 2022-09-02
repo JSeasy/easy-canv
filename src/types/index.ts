@@ -24,3 +24,7 @@ export interface IInitOptions {
   width: number;
   stored?: boolean;
 }
+
+export type TMouseAction = "dwon" | "up" | "move";
+
+export type TController = "tr" | "tl" | "br" | "bl" | undefined;

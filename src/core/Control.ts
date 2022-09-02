@@ -45,28 +45,28 @@ class Control {
     const { x, y, height, width } = this.getTransformPosition();
     const rectWidth = 15;
     const halfRectWidth = rectWidth / 2;
-    this.tr = new Rect({
-      x: x - halfRectWidth,
-      y: y - halfRectWidth,
-      height: rectWidth,
-      width: rectWidth,
-      fillStyle: "blue",
-    });
     this.tl = new Rect({
       x: x - halfRectWidth,
-      y: y + height - halfRectWidth,
-      height: rectWidth,
-      width: rectWidth,
-      fillStyle: "blue",
-    });
-    this.br = new Rect({
-      x: x + width - halfRectWidth,
       y: y - halfRectWidth,
       height: rectWidth,
       width: rectWidth,
       fillStyle: "blue",
     });
     this.bl = new Rect({
+      x: x - halfRectWidth,
+      y: y + height - halfRectWidth,
+      height: rectWidth,
+      width: rectWidth,
+      fillStyle: "blue",
+    });
+    this.tr = new Rect({
+      x: x + width - halfRectWidth,
+      y: y - halfRectWidth,
+      height: rectWidth,
+      width: rectWidth,
+      fillStyle: "blue",
+    });
+    this.br = new Rect({
       x: x + width - halfRectWidth,
       y: y + height - halfRectWidth,
       height: rectWidth,

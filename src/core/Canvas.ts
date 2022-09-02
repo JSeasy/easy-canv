@@ -1,4 +1,11 @@
-import { IInitOptions, IPoint, ITarget, TObjects } from "../types";
+import {
+  IInitOptions,
+  IPoint,
+  ITarget,
+  TController,
+  TMouseAction,
+  TObjects,
+} from "../types";
 import Control from "./Control";
 import Line from "./Line";
 
@@ -6,8 +13,6 @@ class Canvas {
   canvas: HTMLCanvasElement | null;
   objects: TObjects;
   control: Control | null;
-  redo: TObjects[];
-  undo: TObjects[];
   activeObject: ITarget | null;
   ctx: CanvasRenderingContext2D | null;
   height: number;
@@ -15,15 +20,13 @@ class Canvas {
   paddingX: number;
   paddingY: number;
   stored: boolean;
-  controlType: string;
-  mouseDownPosition: IPoint | null;
+  controlType: TController;
+  mouseActionType: TMouseAction;
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
     this.control = null;
-    this.controlType = "";
-    this.redo = [];
-    this.undo = [];
+    this.controlType = undefined;
     this.activeObject = null;
     this.paddingX = 0;
     this.paddingY = 0;
@@ -31,7 +34,8 @@ class Canvas {
     this.width = width;
     this.stored = stored;
     this.ctx = null;
-    this.mouseDownPosition = null;
+
+    this.mouseActionType = "up";
     this.init(el);
     this.bindEvent();
   }
@@ -44,37 +48,74 @@ class Canvas {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
   }
+
+  // 获取在鼠标内的对象
+  getOverMouseObject(offsetX: number, offsetY: number) {
+    const filterObjects = this.objects.filter((object) =>
+      this.isIncludesTheRange(offsetX, offsetY, object)
+    );
+    return filterObjects;
+  }
+
+  reset() {
+    this.render();
+    this.paddingX = 0;
+    this.paddingY = 0;
+    this.control = null;
+    this.activeObject = null;
+  }
   //绑定事件
   bindEvent() {
     const { canvas } = this;
     canvas!.addEventListener("mousedown", (e) => {
+      this.mouseActionType = "dwon";
       const { offsetX, offsetY } = e;
-      if (this.controlType) {
-        this.mouseDownPosition = {
-          x: offsetX,
-          y: offsetY,
-        };
+      const activeObjects = this.getOverMouseObject(offsetX, offsetY);
+      if (!activeObjects.length) {
+        !this.controlType && this.reset();
+
         return;
       }
-      const filterObjects = this.objects.filter((object) =>
-        this.isIncludesTheRange(offsetX, offsetY, object)
-      );
-      if (!filterObjects.length) {
-        this.render();
-        this.control = null;
-        return;
-      }
-      this.activeObject = filterObjects[filterObjects.length - 1];
-      this.render();
+
+      this.activeObject = activeObjects.at(-1) as ITarget;
       this.drawControl(this.activeObject);
       this.paddingX = offsetX - this.activeObject.x;
       this.paddingY = offsetY - this.activeObject.y;
     });
 
     canvas!.addEventListener("mousemove", (e) => {
-      !this.activeObject && this.changeTheCursorStyle(e);
-      if (!this.activeObject) return;
       const { offsetX, offsetY } = e;
+
+      if (this.mouseActionType === "up" || !this.activeObject) {
+        this.changeTheCursorStyle(e);
+        return;
+      }
+
+      if (this.controlType) {
+        const { x, y } = this.getStartPosition(
+          this.activeObject,
+          this.controlType
+        )!;
+
+        const diffScaleX = (2 * (offsetX - x)) / x;
+        const diffScaleY = (2 * (offsetY - y)) / y;
+
+        this.activeObject.scaleX = this.activeObject.scaleX! + diffScaleX;
+        this.activeObject.scaleY = this.activeObject.scaleY! + diffScaleY;
+        // this.activeObject.x =
+        // this.activeObject.y = this.activeObject.scaleY! + 2 * diffScaleY;
+        if (this.controlType === "tr") {
+        }
+        // if (this.controlType === "tl") {
+        // }
+        // if (this.controlType === "bl") {
+        // }
+
+        this.render();
+        this.drawControl(this.activeObject);
+        console.log(this.activeObject);
+        return;
+      }
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
       this.render();
@@ -82,22 +123,39 @@ class Canvas {
       this.drawHelpLine();
     });
     document.addEventListener("mouseup", (e) => {
-      this.activeObject && this.reset();
-      this.activeObject && this.stored && this.save();
+      this.mouseActionType = "up";
     });
-    canvas!.addEventListener("contextmenu", (e) => {
-      if (this.activeObject) {
-        console.log(123);
-      }
-      e.preventDefault();
-    });
+  }
+  getStartPosition(activeObject: ITarget, type: TController): IPoint | void {
+    if (type === "tr") {
+      return {
+        x: activeObject.x + activeObject.width * activeObject.scaleX!,
+        y: activeObject.y,
+      };
+    }
+    if (type === "br") {
+      return {
+        x: activeObject.x + activeObject.width * activeObject.scaleX!,
+        y: activeObject.y + activeObject.height * activeObject.scaleY!,
+      };
+    }
+    if (type === "bl") {
+      return {
+        x: activeObject.x,
+        y: activeObject.y + activeObject.height * activeObject.scaleY!,
+      };
+    }
+    if (type === "tl") {
+      return {
+        x: activeObject.x,
+        y: activeObject.y,
+      };
+    }
   }
   changeTheCursorStyle(e: MouseEvent) {
     const { offsetX, offsetY } = e;
-    const filterObjects = this.objects.filter((object) =>
-      this.isIncludesTheRange(offsetX, offsetY, object)
-    );
-    filterObjects.length
+    const activeObjects = this.getOverMouseObject(offsetX, offsetY);
+    activeObjects.length
       ? this.setCursorStyle("pointer")
       : this.setCursorStyle("auto");
     this.control && this.changeTheControlMouseStyle(offsetX, offsetY);
@@ -106,12 +164,12 @@ class Canvas {
     const { tr, tl, br, bl } = this.control!;
     if (this.isIncludesTheRange(offsetX, offsetY, tr!)) {
       this.controlType = "tr";
-      this.setCursorStyle("pointer");
+      this.setCursorStyle("ne-resize");
       return;
     }
     if (this.isIncludesTheRange(offsetX, offsetY, tl!)) {
       this.controlType = "tl";
-      this.setCursorStyle("ne-resize");
+      this.setCursorStyle("pointer");
       return;
     }
     if (this.isIncludesTheRange(offsetX, offsetY, br!)) {
@@ -124,7 +182,7 @@ class Canvas {
       this.setCursorStyle("ne-resize");
       return;
     }
-    this.controlType = "";
+    this.controlType = undefined;
   }
 
   setCursorStyle(type: string) {
@@ -162,7 +220,7 @@ class Canvas {
     const halfHeight = this.height / 2;
     const centerPositionY =
       this.activeObject!.y + this.activeObject!.height / 2;
-    if (halfHeight - 2 < centerPositionY && centerPositionY < halfHeight + 2) {
+    if (halfHeight - 1 < centerPositionY && centerPositionY < halfHeight + 1) {
       return true;
     } else {
       return false;
@@ -171,20 +229,13 @@ class Canvas {
   isCenterX() {
     const halfWidth = this.width / 2;
     const centerPositionX = this.activeObject!.x + this.activeObject!.width / 2;
-    if (halfWidth - 2 < centerPositionX && centerPositionX < halfWidth + 2) {
+    if (halfWidth - 1 < centerPositionX && centerPositionX < halfWidth + 1) {
       return true;
     } else {
       return false;
     }
   }
-  save() {
-    this.redo.push(this.objects);
-  }
-  reset() {
-    this.activeObject = null;
-    this.paddingX = 0;
-    this.paddingY = 0;
-  }
+
   drawControl(target: ITarget) {
     const control = new Control(target);
     control.draw(this.ctx!);
@@ -194,10 +245,13 @@ class Canvas {
   isIncludesTheRange(
     offsetX: number,
     offsetY: number,
-    { x, y, height, width }: ITarget
+    { x, y, height, width, scaleX, scaleY }: ITarget
   ) {
     return (
-      offsetX > x && offsetX < x + width && offsetY < y + height && offsetY > y
+      offsetX > x &&
+      offsetX < x + width * scaleX! &&
+      offsetY < y + height * scaleY! &&
+      offsetY > y
     );
   }
 
@@ -217,12 +271,9 @@ class Canvas {
   render() {
     this.clear();
     this.objects.forEach((item) => {
-      console.log("123");
       this.draw(item);
     });
   }
-  // upper(target) {}
-  // lower(target) {}
 }
 
 export default Canvas;

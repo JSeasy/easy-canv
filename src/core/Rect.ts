@@ -29,7 +29,7 @@ class Rect {
     const { fillStyle, x, y, height, width, scaleX, scaleY } = this;
     ctx.fillStyle = fillStyle;
 
-    ctx.fillRect(x, y, height * scaleY!, width * scaleX!);
+    ctx.fillRect(x, y, width * scaleX!, height * scaleY!);
   }
 }
 
