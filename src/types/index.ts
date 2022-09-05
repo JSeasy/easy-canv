@@ -28,3 +28,15 @@ export interface IInitOptions {
 export type TMouseAction = "dwon" | "up" | "move";
 
 export type TController = "tr" | "tl" | "br" | "bl" | undefined;
+
+export interface IActiveScale {
+  scaleX: number;
+  scaleY: number;
+}
+
+// 图片传参
+export interface IPOption extends IPoint {
+  src: HTMLImageElement;
+  scaleX?: number;
+  scaleY?: number;
+}

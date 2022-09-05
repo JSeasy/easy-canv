@@ -1,4 +1,6 @@
-class Rect {
+import Base from "./Base";
+
+class Rect extends Base {
   x: number;
   y: number;
   height: number;
@@ -7,15 +9,8 @@ class Rect {
   scaleX?: number;
   scaleY?: number;
   type: "Rect";
-  constructor({
-    x,
-    y,
-    height,
-    width,
-    fillStyle,
-    scaleX = 1,
-    scaleY = 1,
-  }: Omit<Rect, "type" | "draw">) {
+  constructor({ x, y, height, width, fillStyle, scaleX = 1, scaleY = 1 }: any) {
+    super();
     this.x = x;
     this.y = y;
     this.height = height;

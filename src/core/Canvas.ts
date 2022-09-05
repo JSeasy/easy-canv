@@ -22,6 +22,7 @@ class Canvas {
   stored: boolean;
   controlType: TController;
   mouseActionType: TMouseAction;
+  mouseDownPosition: IPoint | undefined;
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
@@ -34,7 +35,7 @@ class Canvas {
     this.width = width;
     this.stored = stored;
     this.ctx = null;
-
+    this.mouseDownPosition = undefined;
     this.mouseActionType = "up";
     this.init(el);
     this.bindEvent();
@@ -63,59 +64,65 @@ class Canvas {
     this.paddingY = 0;
     this.control = null;
     this.activeObject = null;
+    this.controlType = undefined;
+  }
+
+  setMouseDownInfo(x: number, y: number) {
+    this.mouseDownPosition = { x, y };
+    this.activeObject!.activeScale = {
+      scaleX: this.activeObject!.scaleX!,
+      scaleY: this.activeObject!.scaleY!,
+    };
+  }
+  deleteObject(target: ITarget) {
+    const index = this.objects.indexOf(target);
+    this.objects.splice(index, 1);
+    this.render();
   }
   //绑定事件
   bindEvent() {
     const { canvas } = this;
     canvas!.addEventListener("mousedown", (e) => {
-      this.mouseActionType = "dwon";
       const { offsetX, offsetY } = e;
+      this.mouseActionType = "dwon";
       const activeObjects = this.getOverMouseObject(offsetX, offsetY);
-      if (!activeObjects.length) {
-        !this.controlType && this.reset();
-
-        return;
+      if (this.controlType === "br") {
+        this.setMouseDownInfo(offsetX, offsetY);
+      } else if (this.controlType === "tr") {
+        this.deleteObject(this.activeObject!);
+      } else if (!activeObjects.length) {
+        this.reset();
+      } else {
+        this.activeObject = activeObjects.at(-1) as ITarget;
+        this.render();
+        this.drawControl(this.activeObject);
+        this.paddingX = offsetX - this.activeObject.x;
+        this.paddingY = offsetY - this.activeObject.y;
       }
-
-      this.activeObject = activeObjects.at(-1) as ITarget;
-      this.drawControl(this.activeObject);
-      this.paddingX = offsetX - this.activeObject.x;
-      this.paddingY = offsetY - this.activeObject.y;
     });
 
     canvas!.addEventListener("mousemove", (e) => {
       const { offsetX, offsetY } = e;
-
       if (this.mouseActionType === "up" || !this.activeObject) {
         this.changeTheCursorStyle(e);
         return;
       }
-
-      if (this.controlType) {
-        const { x, y } = this.getStartPosition(
-          this.activeObject,
-          this.controlType
-        )!;
-
-        const diffScaleX = (2 * (offsetX - x)) / x;
-        const diffScaleY = (2 * (offsetY - y)) / y;
-
-        this.activeObject.scaleX = this.activeObject.scaleX! + diffScaleX;
-        this.activeObject.scaleY = this.activeObject.scaleY! + diffScaleY;
-        // this.activeObject.x =
-        // this.activeObject.y = this.activeObject.scaleY! + 2 * diffScaleY;
-        if (this.controlType === "tr") {
-        }
-        // if (this.controlType === "tl") {
-        // }
-        // if (this.controlType === "bl") {
-        // }
-
+      if (this.controlType === "br") {
+        const { x, y } = this.mouseDownPosition!;
+        const diffX = offsetX - x;
+        const diffY = offsetY - y;
+        const { height, width } = this.getRealActiveObjectHW();
+        const diffHeight = height + diffY;
+        const diffWidth = width + diffX;
+        this.activeObject.scaleX =
+          (diffWidth * this.activeObject.activeScale.scaleX) / width;
+        this.activeObject.scaleY =
+          (diffHeight * this.activeObject.activeScale.scaleY) / height;
         this.render();
         this.drawControl(this.activeObject);
-        console.log(this.activeObject);
         return;
       }
+
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
       this.render();
@@ -126,32 +133,14 @@ class Canvas {
       this.mouseActionType = "up";
     });
   }
-  getStartPosition(activeObject: ITarget, type: TController): IPoint | void {
-    if (type === "tr") {
-      return {
-        x: activeObject.x + activeObject.width * activeObject.scaleX!,
-        y: activeObject.y,
-      };
-    }
-    if (type === "br") {
-      return {
-        x: activeObject.x + activeObject.width * activeObject.scaleX!,
-        y: activeObject.y + activeObject.height * activeObject.scaleY!,
-      };
-    }
-    if (type === "bl") {
-      return {
-        x: activeObject.x,
-        y: activeObject.y + activeObject.height * activeObject.scaleY!,
-      };
-    }
-    if (type === "tl") {
-      return {
-        x: activeObject.x,
-        y: activeObject.y,
-      };
-    }
+  getRealActiveObjectHW() {
+    const { height, width, activeScale } = this.activeObject!;
+    return {
+      height: height * activeScale.scaleY!,
+      width: width * activeScale.scaleX!,
+    };
   }
+
   changeTheCursorStyle(e: MouseEvent) {
     const { offsetX, offsetY } = e;
     const activeObjects = this.getOverMouseObject(offsetX, offsetY);
@@ -164,7 +153,7 @@ class Canvas {
     const { tr, tl, br, bl } = this.control!;
     if (this.isIncludesTheRange(offsetX, offsetY, tr!)) {
       this.controlType = "tr";
-      this.setCursorStyle("ne-resize");
+      this.setCursorStyle("pointer");
       return;
     }
     if (this.isIncludesTheRange(offsetX, offsetY, tl!)) {

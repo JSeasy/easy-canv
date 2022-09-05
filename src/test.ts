@@ -28,8 +28,8 @@ document.querySelector("#addPhoto")?.addEventListener("click", () => {
       src: img,
       x: 100,
       y: 200,
-      width: 100,
-      height: 200,
+      scaleX: 0.5,
+      scaleY: 0.5,
     });
     EasyCanv.add(photo);
     EasyCanv.render();
