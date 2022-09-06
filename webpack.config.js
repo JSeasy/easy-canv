@@ -1,6 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 module.exports = {
   entry: "./src/test.ts",
   output: {
@@ -33,6 +33,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new SpeedMeasurePlugin(),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
       filename: "index.html",

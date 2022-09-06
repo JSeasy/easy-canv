@@ -90,6 +90,7 @@ class Canvas {
         this.setMouseDownInfo(offsetX, offsetY);
       } else if (this.controlType === "tr") {
         this.deleteObject(this.activeObject!);
+        this.reset();
       } else if (!activeObjects.length) {
         this.reset();
       } else {

@@ -7,9 +7,7 @@ export interface IPoint {
   y: number;
 }
 
-export interface IBase {
-  x: number;
-  y: number;
+export interface IBase extends IPoint {
   height: number;
   width: number;
 }
@@ -39,4 +37,12 @@ export interface IPOption extends IPoint {
   src: HTMLImageElement;
   scaleX?: number;
   scaleY?: number;
+}
+
+export interface IROption extends IPoint {
+  height: number;
+  width: number;
+  scaleX: number;
+  scaleY: number;
+  fillStyle: string;
 }
