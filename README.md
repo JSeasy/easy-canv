@@ -36,13 +36,14 @@ img.onload = () => {
   EasyCanv.render();
 };
 ```
-### todo
-- 控制元素旋转~~缩放删除~~
-- 撤销恢复
-- 添加文本
-- 添加动画
-- 从数据恢复canvas
-- 添加元素间辅助线
-- 元素图层上下移动
-- 无限拖拽,canvas放大缩小
 
+### todo
+
+- :triangular_flag_on_post: 控制元素旋转~~缩放删除~~
+- :triangular_flag_on_post: 撤销恢复
+- :triangular_flag_on_post: 添加文本
+- :triangular_flag_on_post: 添加动画
+- :triangular_flag_on_post: 从数据恢复 canvas
+- :triangular_flag_on_post:添加元素间辅助线
+- :white_check_mark:元素图层上下移动
+- :triangular_flag_on_post:无限拖拽,canvas 放大缩小

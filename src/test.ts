@@ -1,6 +1,6 @@
 import { Canvas, Line, Rect, Photo } from "./index";
 
-const EasyCanv = new Canvas({
+const canv = new Canvas({
   el: ".canvasWrap",
   height: 550,
   width: 550,
@@ -15,8 +15,8 @@ document.querySelector("#addRect")?.addEventListener("click", () => {
     width: 100,
     fillStyle: "yellow",
   });
-  EasyCanv.add(rect);
-  EasyCanv.render();
+  canv.add(rect);
+  canv.render();
 });
 
 document.querySelector("#addPhoto")?.addEventListener("click", () => {
@@ -31,7 +31,16 @@ document.querySelector("#addPhoto")?.addEventListener("click", () => {
       scaleX: 0.5,
       scaleY: 0.5,
     });
-    EasyCanv.add(photo);
-    EasyCanv.render();
+    canv.add(photo);
+    canv.render();
   };
+});
+
+document.querySelector("#goForward")?.addEventListener("click", () => {
+  const { activeObject } = canv;
+  canv.goForward(activeObject!);
+});
+document.querySelector("#goBackward")?.addEventListener("click", () => {
+  const { activeObject } = canv;
+  canv.goBackward(activeObject!);
 });

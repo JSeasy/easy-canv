@@ -65,6 +65,7 @@ class Canvas {
     this.control = null;
     this.activeObject = null;
     this.controlType = undefined;
+    this.render();
   }
 
   setMouseDownInfo(x: number, y: number) {
@@ -75,7 +76,7 @@ class Canvas {
     };
   }
   deleteObject(target: ITarget) {
-    const index = this.objects.indexOf(target);
+    const index = this.getTargetIndex(target);
     this.objects.splice(index, 1);
     this.render();
   }
@@ -96,7 +97,7 @@ class Canvas {
       } else {
         this.activeObject = activeObjects.at(-1) as ITarget;
         this.render();
-        this.drawControl(this.activeObject);
+        // this.drawControl(this.activeObject);
         this.paddingX = offsetX - this.activeObject.x;
         this.paddingY = offsetY - this.activeObject.y;
       }
@@ -120,14 +121,14 @@ class Canvas {
         this.activeObject.scaleY =
           (diffHeight * this.activeObject.activeScale.scaleY) / height;
         this.render();
-        this.drawControl(this.activeObject);
+        // this.drawControl(this.activeObject);
         return;
       }
 
       this.activeObject.x = offsetX - this.paddingX;
       this.activeObject.y = offsetY - this.paddingY;
       this.render();
-      this.drawControl(this.activeObject);
+      // this.drawControl(this.activeObject);
       this.drawHelpLine();
     });
     document.addEventListener("mouseup", (e) => {
@@ -263,6 +264,29 @@ class Canvas {
     this.objects.forEach((item) => {
       this.draw(item);
     });
+    const { activeObject } = this;
+    activeObject && this.drawControl(activeObject);
+  }
+  getTargetIndex(target: ITarget) {
+    return this.objects.indexOf(target);
+  }
+
+  goForward(target: ITarget) {
+    const index = this.getTargetIndex(target);
+    if (index === this.objects.length - 1) return;
+    const preObject = this.objects[index + 1];
+    this.objects[index] = preObject;
+    this.objects[index + 1] = target;
+    this.render();
+  }
+
+  goBackward(target: ITarget) {
+    const index = this.getTargetIndex(target);
+    if (index === 0) return;
+    const nextObject = this.objects[index - 1];
+    this.objects[index] = nextObject;
+    this.objects[index - 1] = target;
+    this.render();
   }
 }
 
