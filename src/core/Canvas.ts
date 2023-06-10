@@ -23,6 +23,9 @@ class Canvas {
   controlType: TController;
   mouseActionType: TMouseAction;
   mouseDownPosition: IPoint | undefined;
+  scale: number;
+  x: number;
+  y: number;
   constructor({ el, height, width, stored = false }: IInitOptions) {
     this.canvas = null;
     this.objects = [];
@@ -39,6 +42,9 @@ class Canvas {
     this.mouseActionType = "up";
     this.init(el);
     this.bindEvent();
+    this.scale = 1;
+    this.x = 0;
+    this.y = 0;
   }
   init(el: string) {
     const canvasWrap = document.querySelector(el);
@@ -133,6 +139,34 @@ class Canvas {
     });
     document.addEventListener("mouseup", (e) => {
       this.mouseActionType = "up";
+    });
+    canvas?.addEventListener("wheel", (e: any) => {
+      const { ctx } = this;
+      const { a } = ctx?.getTransform()!;
+      const { offsetX, offsetY } = e;
+      this.x = offsetX;
+      this.y = offsetY;
+      if (e.wheelDeltaY < 0) {
+        ctx?.setTransform(
+          a - 0.1,
+          0,
+          0,
+          a - 0.1,
+          offsetX * (1 - a),
+          offsetY * (1 - a)
+        );
+      } else {
+        ctx?.setTransform(
+          a + 0.1,
+          0,
+          0,
+          a + 0.1,
+          offsetX * (1 - a),
+          offsetY * (1 - a)
+        );
+      }
+
+      this.render();
     });
   }
   getRealActiveObjectHW() {
@@ -251,6 +285,7 @@ class Canvas {
   }
   draw(item: ITarget) {
     const { ctx } = this;
+
     item.draw(ctx!);
   }
 

@@ -44,3 +44,10 @@ document.querySelector("#goBackward")?.addEventListener("click", () => {
   const { activeObject } = canv;
   canv.goBackward(activeObject!);
 });
+
+document.querySelector("#setTransition")?.addEventListener("click", () => {
+  const { ctx } = canv;
+  const { a } = ctx?.getTransform()!;
+  ctx?.setTransform(a + 1, 0, 0, a + 1, -136 * a, -136 * a);
+  canv.render();
+});

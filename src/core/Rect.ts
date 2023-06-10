@@ -23,7 +23,6 @@ class Rect extends Base {
   draw(ctx: CanvasRenderingContext2D) {
     const { fillStyle, x, y, height, width, scaleX, scaleY } = this;
     ctx.fillStyle = fillStyle;
-
     ctx.fillRect(x, y, width * scaleX!, height * scaleY!);
   }
 }
